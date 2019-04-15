@@ -56,17 +56,27 @@ def beambroke():
 
 if __name__ == '__main__':
     beamState = 1
-    target = 0
+    target = 1
+    distArray = []
     try:
         while True: #loop for the whole system
-            target += 1 #0 comp, 1 recyc, 2 trash
-	    if target > 2:
+           target += 1 #0 comp, 1 recyc, 2 trash
+	   if target > 2:
 		target = 0
-            os.system('aplay ' + instrucs[target]) #play instructions
-            while True: #loop to keep taking data
-                dist = distance()
+           os.system('aplay ' + instrucs[target]) #play instructions 
+	   distArray = [700, 700, 700]
+	   while True: #loop to keep taking data
+		distRaw = distance()
+		distArray.append(distRaw)
+		if len(distArray) > 3:
+			del distArray[0]
+		dist = 0
+		for d in distArray: dist += d
+		dist /= len(distArray)
+		print("{} {}".format(distRaw, dist))
 		prevState = beamState
                 beamState = beambroke()
+		print(beamState)
                 if (dist > 100):
                     arrow = -1
                 elif (dist > 50):
@@ -79,11 +89,11 @@ if __name__ == '__main__':
                     arrow = 2
                     break 
                 time.sleep(0.1)
-            if target == arrow:
+           if target == arrow:
                 os.system('aplay ' + random.choice(positive))
-            else:
+           else:
                 os.system('aplay ' + random.choice(negative))
-	    time.sleep(0.5) #wait before asking again
+	   time.sleep(0.5) #wait before asking again
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
         print("Measurement stopped by User")
